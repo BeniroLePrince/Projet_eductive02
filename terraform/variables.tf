@@ -3,14 +3,19 @@ variable "region_GRA11" {
   type    = string
 }
 
-variable "SBG5" {
+variable "region_SBG5" {
   default = "SBG5"
   type    = string
 }
 
 variable"i" {
-   type = string
-   default = 3
+   type = number
+   default = 1
+}
+
+variable "instance_name_front" {
+  type     = string 
+  default  = "front_eductive02"
 }
 
 variable "instance_name_gra" {
