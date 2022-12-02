@@ -32,3 +32,5 @@ variable "flavor_name" {
   type    = string 
   default = "s1-2"
 }
+
+ier
