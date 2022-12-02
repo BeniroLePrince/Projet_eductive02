@@ -33,4 +33,3 @@ variable "flavor_name" {
   default = "s1-2"
 }
 
-ier
