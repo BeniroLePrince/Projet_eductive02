@@ -10,7 +10,7 @@ variable "region_SBG5" {
 
 variable"i" {
    type = number
-   default = 1
+   default = 3
 }
 
 variable "instance_name_front" {
