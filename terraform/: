@@ -25,12 +25,8 @@ resource "openstack_compute_instance_v2" "Instance_Backend_GRA11" {
 
 # Composant réseau par défaut	
   network {
-	name = "Ext-Net"
-  }
-  network {
-    	name = ovh_cloud_project_network_private.network.name
-  }
-  depends_on = [ovh_cloud_project_network_private_subnet.subnet]
+    name      = "Ext-Net"
+ }
 }
 
 resource "openstack_compute_instance_v2" "Instance_Backend_SBG" {
@@ -48,11 +44,6 @@ resource "openstack_compute_instance_v2" "Instance_Backend_SBG" {
   network {
     name      = "Ext-Net"
   }
-  network {
-    	name = ovh_cloud_project_network_private.network.name
-  }
-  depends_on = [ovh_cloud_project_network_private_subnet.subnet]
-
   }
 
 resource "openstack_compute_instance_v2" "Instance_Front" {
@@ -70,31 +61,22 @@ resource "openstack_compute_instance_v2" "Instance_Front" {
   network {
     name      = "Ext-Net"
   }
-  network {
-    	name = ovh_cloud_project_network_private.network.name
-  }
-   depends_on = [ovh_cloud_project_network_private_subnet.subnet]
-
  }
 
 # Création d'un réseau privé
- resource "ovh_cloud_project_network_private" "network" {
+ resource "ovh_cloud_project_network_private" "network_gra" {
     service_name = var.service_name
-    name         = "vrack_private_network"  # Nom du réseau
-    regions      = var.regions
+    name         = "private_network_${var.instance_name_gra}"                        # Nom du réseau
+    regions      = ["GRA11"]
     provider     = ovh.ovh                                  # Nom du fournisseur
     vlan_id      = var.vlan_id                              # Identifiant du vlan pour le vRrack
  }
 
-resource "ovh_cloud_project_network_private_subnet" "subnet" {
-    count	 = length(var.regions)
+# Création d'un réseau privé
+ resource "ovh_cloud_project_network_private" "network_sbg" {
     service_name = var.service_name
-    network_id   = ovh_cloud_project_network_private.network.id
-    start        = var.vlan_dhcp_start                          # Première IP du sous réseau
-    end          = var.vlan_dhcp_end                            # Dernière IP du sous réseau
-    network      = var.vlan_dhcp_network
-    dhcp         = true                                         # Activation du DHCP
-    region       = var.regions[count.index]
-    provider     = ovh.ovh                                      # Nom du fournisseur
-    no_gateway   = true                                         # Pas de gateway par defaut
+    name         = "private_network_${var.instance_name_sbg}"                        # Nom du réseau
+    regions      = ["SBG5"]
+    provider     = ovh.ovh                                  # Nom du fournisseur
+    vlan_id      = var.vlan_id                              # Identifiant du vlan pour le vRrack
  }

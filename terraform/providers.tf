@@ -22,3 +22,8 @@ provider "openstack" {
   domain_name = "default"                           # Nom de domaine - Toujours à "default" pour OVHcloud
   alias       = "ovh"                               # Un alias
 }
+
+provider "ovh" {
+  alias    = "ovh"
+  endpoint = "ovh-eu"
+}
