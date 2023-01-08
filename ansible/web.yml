@@ -1,0 +1,23 @@
+---
+- name: Install and configure a kitten web page
+  hosts: backend1
+
+  vars:
+      Mon_user_eductive02: "Mon user eductive02 : le meilleur !"
+
+  tasks:
+    - name: Mise à jour des dépôts de paquets
+      apt:
+        update_cache: yes
+    - name: Ensure package nginx is installed
+      apt:
+        name: nginx
+        state: latest
+    - name: Ensure service nginx is running
+      service:
+        name: nginx
+        state: started
+    - name: Configure Kitten Page
+      template:
+        src: templates/index.html
+        dest: /var/www/html/index.html        
