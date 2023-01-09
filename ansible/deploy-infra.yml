@@ -1,11 +1,4 @@
 ---
-- name: Display facts
-  hosts: backend1
-  tasks:
-    - name: Print all available facts
-      ansible.builtin.debug:
-        var: ansible_facts
-
 - name: Install and configure a kitten web page
   hosts: backend1
 
@@ -31,13 +24,6 @@
 
 - name: Install and configure docker
   hosts: backend2
-  become: true
-  vars:
-    container_count: 4
-    default_container_name: docker
-    default_container_image: ubuntu
-    default_container_command: sleep 1d
-
   tasks:
     - name: Install aptitude
       apt:
@@ -80,25 +66,37 @@
           - docker-compose
           - docker-compose-plugin
         state: present 
-    - name: Ensure service docker is running
+
+    - name: run docker
       service:
         name: docker
-        state: started      
+        state: started
+        enabled: yes
 
     - name: Install Docker Module for Python
       pip:
         name: docker
-     
-    - name: ifconfig.io
-      copy:
-        src: templates/ifconfig.io
-        dest: /home/debian/
+
+#    - name: ifconfig.io
+#      copy:
+#        src: templates/ifconfig.io
+#        dest: /home/debian/
 
     - name: Run container
       become: True
       shell:
         cmd: "docker-compose up -d "
         chdir: /home/debian/ifconfig.io/
+
+- name: "Partie pour récupérer les facts du groupe2 depuis localhost"
+  hosts: front
+  any_errors_fatal: yes
+ 
+  tasks:
+  - setup:
+    delegate_to: "{{item}}"
+    delegate_facts: True
+    with_items: "{{groups.backend2}}"
 
 - name: Install and configure haproxy
   hosts: front
@@ -107,11 +105,8 @@
     - name: Install Haproxy
       apt:
         name: haproxy
-        state: present
+        state: present     
     - name: Copy Haproxy Configuration file
-      copy:
+      template:
         src: templates/haproxy.cfg
         dest: /etc/haproxy/haproxy.cfg  
-
-
-  
