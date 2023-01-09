@@ -56,7 +56,7 @@ resource "openstack_compute_instance_v2" "Instance_Backend_SBG" {
   }
 
 resource "openstack_compute_instance_v2" "Instance_Front" {
-  count       = 1		     # Nombre d'instance par region			
+  count       = 1	  # Nombre d'instance par region			
   name        = "${var.instance_name_front}" # nom de l'instance
   provider    = openstack.ovh        # Nom du fournisseur
   image_name  = var.image_name       # Nom de l'image
@@ -80,14 +80,14 @@ resource "openstack_compute_instance_v2" "Instance_Front" {
 # Création d'un réseau privé
  resource "ovh_cloud_project_network_private" "network" {
     service_name = var.service_name
-    name         = "vrack_private_network"  # Nom du réseau
+    name         = "vrack_private_network_02"  # Nom du réseau
     regions      = var.regions
     provider     = ovh.ovh                                  # Nom du fournisseur
     vlan_id      = var.vlan_id                              # Identifiant du vlan pour le vRrack
  }
 
 resource "ovh_cloud_project_network_private_subnet" "subnet" {
-    count	 = length(var.regions)
+    count        = length(var.regions)
     service_name = var.service_name
     network_id   = ovh_cloud_project_network_private.network.id
     start        = var.vlan_dhcp_start                          # Première IP du sous réseau
@@ -98,3 +98,16 @@ resource "ovh_cloud_project_network_private_subnet" "subnet" {
     provider     = ovh.ovh                                      # Nom du fournisseur
     no_gateway   = true                                         # Pas de gateway par defaut
  }
+
+ resource "local_file" "inventory" {
+  filename = "../ansible/inventory.yml"
+  content = templatefile("inventory.tmpl",
+    {
+      first_instance_grav = openstack_compute_instance_v2.Instance_Backend_GRA11[0].access_ip_v4
+      second_instance_grav  = openstack_compute_instance_v2.Instance_Backend_GRA11[1].access_ip_v4
+      first_instance_sbg  = openstack_compute_instance_v2.Instance_Backend_SBG[0].access_ip_v4
+      second_instance_sbg  = openstack_compute_instance_v2.Instance_Backend_SBG[1].access_ip_v4
+      front = openstack_compute_instance_v2.Instance_Front[0].access_ip_v4
+    }
+  )
+}

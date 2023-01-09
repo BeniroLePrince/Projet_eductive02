@@ -1,0 +1,28 @@
+---
+backend1:
+  hosts:
+    ${first_instance_grav}:
+      ansible_user: debian
+      ansible_become: True
+    ${first_instance_sbg}:
+      ansible_user: debian
+      ansible_become: True
+
+backend2:
+  hosts:
+    ${second_instance_grav}:
+      ansible_user: debian
+      ansible_become: True
+    ${second_instance_sbg}:
+      ansible_user: debian
+      ansible_become: True
+
+front:
+  hosts:
+    ${front}:
+      ansible_user: debian
+      ansible_become: True    
+
+
+
+

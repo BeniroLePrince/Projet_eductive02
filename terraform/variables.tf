@@ -9,7 +9,7 @@ variable "region_SBG5" {
 }
 
 variable "regions" {
-   default = ["GRA11","SBG5"]
+   default = ["SBG5","GRA11"]
    type    = list
 }
 
@@ -45,21 +45,20 @@ variable "flavor_name" {
 
 variable "service_name" {
   type    = string
-  default = "subnet_vrack"
 }
 variable "vlan_id" {
   type    = number
-  default = 02
+  default = 2
 }
 variable "vlan_dhcp_start" {
   type = string
-  default = "192.168.02.100"
+  default = "192.168.2.100"
 }
 variable "vlan_dhcp_end" {
   type = string
-  default = "192.168.02.200"
+  default = "192.168.2.200"
 }
 variable "vlan_dhcp_network" {
   type = string
-  default = "192.168.02.0/24"
+  default = "192.168.2.0/24"
 }
