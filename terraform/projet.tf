@@ -77,6 +77,46 @@ resource "openstack_compute_instance_v2" "Instance_Front" {
 
  }
 
+resource "ovh_cloud_project_database" "db_eductive02" {
+  service_name = var.service_name
+  description  = var.name_db
+  engine       = "mysql"
+  version      = "8"
+  plan         = "essential"
+  nodes {
+    region = "GRA"
+  }
+  flavor = "db1-4"
+}
+
+resource "ovh_cloud_project_database_user" "db_eductive02" {
+  service_name = ovh_cloud_project_database.db_eductive02.service_name
+  engine       = "mysql"
+  cluster_id   = ovh_cloud_project_database.db_eductive02.id
+  name         = "user"
+}
+
+resource "ovh_cloud_project_database_database" "database" {
+  service_name  = ovh_cloud_project_database.db_eductive02.service_name
+  engine        = ovh_cloud_project_database.db_eductive02.engine
+  cluster_id    = ovh_cloud_project_database.db_eductive02.id
+  name          = "mydatabase"
+}
+
+resource "ovh_cloud_project_database_ip_restriction" "db_eductive02" {
+  service_name = ovh_cloud_project_database.db_eductive02.service_name
+  engine       = ovh_cloud_project_database.db_eductive02.engine
+  cluster_id   = ovh_cloud_project_database.db_eductive02.id
+  ip           = "${openstack_compute_instance_v2.Instance_Backend_GRA11[2].access_ip_v4}/32"
+}
+
+resource "ovh_cloud_project_database_ip_restriction" "db_eductive002" {
+  service_name = ovh_cloud_project_database.db_eductive02.service_name
+  engine       = ovh_cloud_project_database.db_eductive02.engine
+  cluster_id   = ovh_cloud_project_database.db_eductive02.id
+  ip           = "${openstack_compute_instance_v2.Instance_Backend_SBG[2].access_ip_v4}/32"
+}
+
 # Création d'un réseau privé
  resource "ovh_cloud_project_network_private" "network" {
     service_name = var.service_name
@@ -111,6 +151,8 @@ resource "ovh_cloud_project_network_private_subnet" "subnet" {
       third_instance_sbg = openstack_compute_instance_v2.Instance_Backend_SBG[2].access_ip_v4
       front = openstack_compute_instance_v2.Instance_Front[0].access_ip_v4
       frontPrivée= openstack_compute_instance_v2.Instance_Front[0].network[1].fixed_ip_v4
+      mdpdb = ovh_cloud_project_database_user.db_eductive02.password
+      
     }
   )
 }

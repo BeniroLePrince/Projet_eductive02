@@ -43,6 +43,16 @@ variable "flavor_name" {
   default = "s1-2"
 }
 
+variable "flavor_db" {
+  type    = string 
+  default = "s1-2"
+}
+
+variable "name_db" {
+  type    = string
+  default = "dbeductive02"
+}
+
 variable "service_name" {
   type    = string
 }

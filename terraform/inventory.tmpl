@@ -22,6 +22,7 @@ backend3:
     ${third_instance_grav}:
       ansible_user: debian
       ansible_become: True
+      db: ${mdpdb}
       IpPrive: ${frontPrivée}
     ${third_instance_sbg}:
       ansible_user: debian
@@ -33,6 +34,8 @@ front:
     ${front}:
       ansible_user: debian
       ansible_become: True
+
+      
     
 
 
