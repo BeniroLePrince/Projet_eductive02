@@ -17,11 +17,28 @@ backend2:
       ansible_user: debian
       ansible_become: True
 
+backend3:
+  hosts:
+    ${third_instance_grav}:
+      ansible_user: debian
+      ansible_become: True
+      IpPrive: ${frontPrivée}
+    ${third_instance_sbg}:
+      ansible_user: debian
+      ansible_become: True
+      IpPrive: ${frontPrivée}
+
 front:
   hosts:
     ${front}:
       ansible_user: debian
-      ansible_become: True    
+      ansible_become: True
+    
+
+
+  
+
+
 
 
 

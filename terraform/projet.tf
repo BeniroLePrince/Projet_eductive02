@@ -105,9 +105,12 @@ resource "ovh_cloud_project_network_private_subnet" "subnet" {
     {
       first_instance_grav = openstack_compute_instance_v2.Instance_Backend_GRA11[0].access_ip_v4
       second_instance_grav  = openstack_compute_instance_v2.Instance_Backend_GRA11[1].access_ip_v4
+      third_instance_grav = openstack_compute_instance_v2.Instance_Backend_GRA11[2].access_ip_v4
       first_instance_sbg  = openstack_compute_instance_v2.Instance_Backend_SBG[0].access_ip_v4
       second_instance_sbg  = openstack_compute_instance_v2.Instance_Backend_SBG[1].access_ip_v4
+      third_instance_sbg = openstack_compute_instance_v2.Instance_Backend_SBG[2].access_ip_v4
       front = openstack_compute_instance_v2.Instance_Front[0].access_ip_v4
+      frontPrivée= openstack_compute_instance_v2.Instance_Front[0].network[1].fixed_ip_v4
     }
   )
 }
