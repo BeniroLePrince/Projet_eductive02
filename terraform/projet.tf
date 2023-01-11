@@ -152,7 +152,8 @@ resource "ovh_cloud_project_network_private_subnet" "subnet" {
       front = openstack_compute_instance_v2.Instance_Front[0].access_ip_v4
       frontPrivée= openstack_compute_instance_v2.Instance_Front[0].network[1].fixed_ip_v4
       mdpdb = ovh_cloud_project_database_user.db_eductive02.password
-      
+      domaindb = ovh_cloud_project_database.db_eductive02.endpoints[0].domain
+      portdb = ovh_cloud_project_database.db_eductive02.endpoints[0].port
     }
   )
 }

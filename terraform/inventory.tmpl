@@ -22,11 +22,16 @@ backend3:
     ${third_instance_grav}:
       ansible_user: debian
       ansible_become: True
-      db: ${mdpdb}
+      mdpdb: ${mdpdb}
+      domainedb: ${domaindb}
+      portdb: ${portdb} 
       IpPrive: ${frontPrivée}
     ${third_instance_sbg}:
       ansible_user: debian
       ansible_become: True
+      mdpdb: ${mdpdb}      
+      domainedb: ${domaindb}
+      portdb: ${portdb} 
       IpPrive: ${frontPrivée}
 
 front:
