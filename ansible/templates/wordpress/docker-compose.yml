@@ -1,0 +1,16 @@
+version: '3.1'
+
+services:
+
+  wordpress:
+    image: wordpress
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_HOST: {{ domainedb }}
+      WORDPRESS_DB_USER: user
+      WORDPRESS_DB_PASSWORD: {{  mdpdb  }} 
+      WORDPRESS_DB_NAME: exampledb
+    volumes:
+      - wordpress:/var/www/html

@@ -35,44 +35,30 @@
 - name: Install and configure docker
   hosts: backend2
   tasks:
-    - name: Install aptitude
-      apt:
-        name: aptitude
-        state: latest
-        update_cache: true
-
     - name: Install required system packages
       apt:
         pkg:
           - apt-transport-https
           - ca-certificates
-          - curl
-          - software-properties-common
-          - python3-pip
-          - virtualenv
-          - python3-setuptools
+          - lsb-release
+          - gnupg
         state: latest
         update_cache: true
 
     - name: Add Docker GPG apt Key
       apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
+        url: https://download.docker.com/linux/debian/gpg
         state: present
 
     - name: Add Docker Repository
       apt_repository:
-        repo: deb https://download.docker.com/linux/ubuntu focal stable
+        repo: deb https://download.docker.com/linux/debian bullseye stable
         state: present
-
-    - name: Update apt and install docker-ce
-      apt:
-        name: docker-ce
-        state: latest
-        update_cache: true
 
     - name: Installation docker-compose
       apt:
         name:
+          - docker
           - docker-compose
           - docker-compose-plugin
         state: present 
@@ -83,14 +69,10 @@
         state: started
         enabled: yes
 
-    - name: Install Docker Module for Python
-      pip:
-        name: docker
-
-#    - name: ifconfig.io
-#      copy:
-#        src: templates/ifconfig.io
-#        dest: /home/debian/
+    - name: ifconfig.io
+      copy:
+        src: templates/ifconfig.io
+        dest: /home/debian/
 
     - name: Run container
       become: True
@@ -107,19 +89,6 @@
     delegate_to: "{{item}}"
     delegate_facts: True
     with_items: "{{groups.backend2}}"
-
-- name: Install and configure haproxy
-  hosts: front
-  become: true
-  tasks:
-    - name: Install Haproxy
-      apt:
-        name: haproxy
-        state: present     
-    - name: Copy Haproxy Configuration file
-      template:
-        src: templates/haproxy.cfg
-        dest: /etc/haproxy/haproxy.cfg  
 
 - name: Install and configure NFS Server
   hosts: front
@@ -148,8 +117,24 @@
         name: nfs-kernel-server
         state: restarted
 
+- name: "Partie pour récupérer les facts du groupe1 depuis localhost"
+  hosts: front
+  any_errors_fatal: yes
+ 
+  tasks:
+  - setup:
+    delegate_to: "{{item}}"
+    delegate_facts: True
+    with_items: "{{groups.backend3}}"
+
 - name: Mount NFS share on backend hosts
   hosts: backend3
+
+  vars:
+    mdpdb: "{{ hostvars[inventory_hostname]['mdpdb'] }}"
+    domainedb : "{{ hostvars[inventory_hostname]['domainedb'] }}"
+    portdb : "{{ hostvars[inventory_hostname]['portdb'] }}"
+
   tasks:
     - name: Install NFS client
       apt:
@@ -165,5 +150,61 @@
         src: "{{ hostvars[inventory_hostname]['IpPrive'] }}:/home/wordpress-data"
         fstype: nfs
         state: mounted
+    - name: Install required system packages
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - lsb-release
+          - gnupg
+        state: latest
+        update_cache: true
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/debian bullseye stable
+        state: present    
+    - name: Installation docker-compose
+      apt:
+        name:
+          - docker
+          - docker-compose
+          - docker-compose-plugin
+        state: present 
+    - name: run docker
+      service:
+        name: docker
+        state: started
+        enabled: yes    
+    - name: Copy docker-compose
+      template:
+        src: templates/wordpress/docker-compose.yml
+        dest: /home/wordpress-data/ 
+      notify: 
+        - Reload haproxy
+      
+    - name: Run container
+      become: True
+      shell:
+        cmd: "docker-compose up -d "
+        chdir: /home/wordpress-data                    
+
+- name: Install and configure haproxy
+  hosts: front
+  become: true
+  tasks:
+    - name: Install Haproxy
+      apt:
+        name: haproxy
+        state: present     
+    - name: Copy Haproxy Configuration file
+      template:
+        src: templates/haproxy.cfg
+        dest: /etc/haproxy/haproxy.cfg  
+      notify: 
+        - Reload haproxy    
 
 
