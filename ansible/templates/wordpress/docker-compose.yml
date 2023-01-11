@@ -6,11 +6,11 @@ services:
     image: wordpress
     restart: always
     ports:
-      - 8080:80
+      - 80:80
     environment:
-      WORDPRESS_DB_HOST: {{ domainedb }}
+      WORDPRESS_DB_HOST: {{ domainedb }}:{{ portdb }}
       WORDPRESS_DB_USER: user
       WORDPRESS_DB_PASSWORD: {{  mdpdb  }} 
-      WORDPRESS_DB_NAME: exampledb
+      WORDPRESS_DB_NAME: mydatabase
     volumes:
-      - wordpress:/var/www/html
+      - ./:/var/www/html

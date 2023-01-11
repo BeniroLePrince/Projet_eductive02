@@ -1,7 +1,9 @@
 - name: Mount NFS share on backend hosts
   hosts: backend3
   vars:
-    WORDPRESS_DB_HOST: {{ hostvars[inventory_hostname]['IpPrive'] }}
+    mdpdb: "{{ hostvars[inventory_hostname]['mdpdb'] }}"
+    domainedb : "{{ hostvars[inventory_hostname]['domainedb'] }}"
+    portdb : "{{ hostvars[inventory_hostname]['portdb'] }}"
   tasks:
     - name: Install NFS client
       apt:
@@ -50,5 +52,9 @@
       template:
         src: templates/wordpress/docker-compose.yml
         dest: /home/wordpress-data/ 
-      notify: 
-        - Reload haproxy
+
+    - name: Run container
+      become: True
+      shell:
+        cmd: "docker-compose up -d "
+        chdir: /home/wordpress-data/ 

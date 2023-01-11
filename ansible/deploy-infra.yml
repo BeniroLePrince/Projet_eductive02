@@ -183,14 +183,12 @@
       template:
         src: templates/wordpress/docker-compose.yml
         dest: /home/wordpress-data/ 
-      notify: 
-        - Reload haproxy
       
     - name: Run container
       become: True
       shell:
         cmd: "docker-compose up -d "
-        chdir: /home/wordpress-data                    
+        chdir: /home/wordpress-data/                    
 
 - name: Install and configure haproxy
   hosts: front
@@ -204,7 +202,9 @@
       template:
         src: templates/haproxy.cfg
         dest: /etc/haproxy/haproxy.cfg  
-      notify: 
-        - Reload haproxy    
+    - name: Ensure service haproxy is running
+      service:
+        name: haproxy
+        state: restarted          
 
 
