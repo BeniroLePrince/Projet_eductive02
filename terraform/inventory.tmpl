@@ -1,38 +1,38 @@
 ---
 backend1:
   hosts:
-    ${first_instance_grav}:
+    ${first_instance_grav}: # IP public 
       ansible_user: debian
       ansible_become: True
-    ${first_instance_sbg}:
+    ${first_instance_sbg}: # IP public
       ansible_user: debian
       ansible_become: True
 
 backend2:
   hosts:
-    ${second_instance_grav}:
+    ${second_instance_grav}: # IP public
       ansible_user: debian
       ansible_become: True
-    ${second_instance_sbg}:
+    ${second_instance_sbg}: # IP public
       ansible_user: debian
       ansible_become: True
 
 backend3:
   hosts:
-    ${third_instance_grav}:
+    ${third_instance_grav}: # IP public
       ansible_user: debian
       ansible_become: True
-      mdpdb: ${mdpdb}
-      domainedb: ${domaindb}
-      portdb: ${portdb} 
-      IpPrive: ${frontPrivée}
+      mdpdb: ${mdpdb} #mdp BDD
+      domainedb: ${domaindb} #Domaine Bdd
+      portdb: ${portdb} #Port bdd
+      IpPrive: ${frontPrivée} # IP privée
     ${third_instance_sbg}:
       ansible_user: debian
       ansible_become: True
-      mdpdb: ${mdpdb}      
-      domainedb: ${domaindb}
-      portdb: ${portdb} 
-      IpPrive: ${frontPrivée}
+      mdpdb: ${mdpdb} #mdp BDD   
+      domainedb: ${domaindb} #Domaine Bdd
+      portdb: ${portdb} #Port bdd 
+      IpPrive: ${frontPrivée} # IP privée
 
 front:
   hosts:

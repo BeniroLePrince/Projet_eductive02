@@ -11,10 +11,8 @@
 
 - name: Install and configure a kitten web page
   hosts: backend1
-
   vars:
     Mon_user_eductive02: "Mon user eductive02 : le meilleur !"
-
   tasks:
     - name: Mise à jour des dépôts de paquets
       apt:
@@ -44,17 +42,14 @@
           - gnupg
         state: latest
         update_cache: true
-
     - name: Add Docker GPG apt Key
       apt_key:
         url: https://download.docker.com/linux/debian/gpg
         state: present
-
     - name: Add Docker Repository
       apt_repository:
         repo: deb https://download.docker.com/linux/debian bullseye stable
         state: present
-
     - name: Installation docker-compose
       apt:
         name:
@@ -62,18 +57,15 @@
           - docker-compose
           - docker-compose-plugin
         state: present 
-
     - name: run docker
       service:
         name: docker
         state: started
         enabled: yes
-
     - name: ifconfig.io
       copy:
         src: templates/ifconfig.io
         dest: /home/debian/
-
     - name: Run container
       become: True
       shell:
@@ -166,29 +158,29 @@
     - name: Add Docker Repository
       apt_repository:
         repo: deb https://download.docker.com/linux/debian bullseye stable
-        state: present    
+        state: present
     - name: Installation docker-compose
       apt:
         name:
           - docker
           - docker-compose
           - docker-compose-plugin
-        state: present 
+        state: present
     - name: run docker
       service:
         name: docker
         state: started
-        enabled: yes    
+        enabled: yes
     - name: Copy docker-compose
       template:
         src: templates/wordpress/docker-compose.yml
-        dest: /home/wordpress-data/ 
+        dest: /home/wordpress-data/
       
     - name: Run container
       become: True
       shell:
         cmd: "docker-compose up -d "
-        chdir: /home/wordpress-data/                    
+        chdir: /home/wordpress-data/
 
 - name: Install and configure haproxy
   hosts: front
@@ -201,10 +193,8 @@
     - name: Copy Haproxy Configuration file
       template:
         src: templates/haproxy.cfg
-        dest: /etc/haproxy/haproxy.cfg  
+        dest: /etc/haproxy/haproxy.cfg
     - name: Ensure service haproxy is running
       service:
         name: haproxy
-        state: restarted          
-
-
+        state: restarted 

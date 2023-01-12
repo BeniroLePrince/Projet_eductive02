@@ -1,17 +1,18 @@
+# Création d'une ressource de paire de clés SSH
 resource "openstack_compute_keypair_v2" "Keypair_GRA11" {
   provider   = openstack.ovh
   name       = "sshkey_eductive02"  # Attention au XX 
   public_key = file("~/.ssh/id_rsa.pub")
   region     = var.region_GRA11
 }
-
+# Création d'une ressource de paire de clés SSH
 resource "openstack_compute_keypair_v2" "Keypair_SBG5" {
   provider   = openstack.ovh
   name       = "sshkey_eductive02"  # Attention au XX 
   public_key = file("~/.ssh/id_rsa.pub")
   region     = var.region_SBG5
 }
-
+# Création des intances à Graveline
 resource "openstack_compute_instance_v2" "Instance_Backend_GRA11" {
   count       = var.i		     # Nombre d'instance par region			
   name        = "${var.instance_name_gra}_${count.index+1}"  # Nom concaténé
@@ -32,7 +33,7 @@ resource "openstack_compute_instance_v2" "Instance_Backend_GRA11" {
   }
   depends_on = [ovh_cloud_project_network_private_subnet.subnet]
 }
-
+# Création des intances à Strasbourg
 resource "openstack_compute_instance_v2" "Instance_Backend_SBG" {
   count       = var.i		     # Nombre d'instance par region			
   name        = "${var.instance_name_sbg}_${count.index+1}"  # Nom concaténé
@@ -54,7 +55,7 @@ resource "openstack_compute_instance_v2" "Instance_Backend_SBG" {
   depends_on = [ovh_cloud_project_network_private_subnet.subnet]
 
   }
-
+#Création de l'instance front
 resource "openstack_compute_instance_v2" "Instance_Front" {
   count       = 1	  # Nombre d'instance par region			
   name        = "${var.instance_name_front}" # nom de l'instance
@@ -76,7 +77,7 @@ resource "openstack_compute_instance_v2" "Instance_Front" {
    depends_on = [ovh_cloud_project_network_private_subnet.subnet]
 
  }
-
+#Création du type de la BDD
 resource "ovh_cloud_project_database" "db_eductive02" {
   service_name = var.service_name
   description  = var.name_db
@@ -88,28 +89,28 @@ resource "ovh_cloud_project_database" "db_eductive02" {
   }
   flavor = "db1-4"
 }
-
+#Creation du User de la BDD
 resource "ovh_cloud_project_database_user" "db_eductive02" {
   service_name = ovh_cloud_project_database.db_eductive02.service_name
   engine       = "mysql"
   cluster_id   = ovh_cloud_project_database.db_eductive02.id
   name         = "user"
 }
-
+#Création de de la BDD
 resource "ovh_cloud_project_database_database" "database" {
   service_name  = ovh_cloud_project_database.db_eductive02.service_name
   engine        = ovh_cloud_project_database.db_eductive02.engine
   cluster_id    = ovh_cloud_project_database.db_eductive02.id
   name          = "mydatabase"
 }
-
+#Création des ip de restriction pour la BDD pout graveline
 resource "ovh_cloud_project_database_ip_restriction" "db_eductive02" {
   service_name = ovh_cloud_project_database.db_eductive02.service_name
   engine       = ovh_cloud_project_database.db_eductive02.engine
   cluster_id   = ovh_cloud_project_database.db_eductive02.id
   ip           = "${openstack_compute_instance_v2.Instance_Backend_GRA11[2].access_ip_v4}/32"
 }
-
+#Création des ip de restriction pour la BDD pour strasbourg
 resource "ovh_cloud_project_database_ip_restriction" "db_eductive002" {
   service_name = ovh_cloud_project_database.db_eductive02.service_name
   engine       = ovh_cloud_project_database.db_eductive02.engine
@@ -138,11 +139,12 @@ resource "ovh_cloud_project_network_private_subnet" "subnet" {
     provider     = ovh.ovh                                      # Nom du fournisseur
     no_gateway   = true                                         # Pas de gateway par defaut
  }
-
+#Copies les valeurs des variables dans le ficher inventory.yml
  resource "local_file" "inventory" {
   filename = "../ansible/inventory.yml"
   content = templatefile("inventory.tmpl",
     {
+      #Recupere les Ip prives et public des intances. 
       first_instance_grav = openstack_compute_instance_v2.Instance_Backend_GRA11[0].access_ip_v4
       second_instance_grav  = openstack_compute_instance_v2.Instance_Backend_GRA11[1].access_ip_v4
       third_instance_grav = openstack_compute_instance_v2.Instance_Backend_GRA11[2].access_ip_v4
@@ -151,6 +153,7 @@ resource "ovh_cloud_project_network_private_subnet" "subnet" {
       third_instance_sbg = openstack_compute_instance_v2.Instance_Backend_SBG[2].access_ip_v4
       front = openstack_compute_instance_v2.Instance_Front[0].access_ip_v4
       frontPrivée= openstack_compute_instance_v2.Instance_Front[0].network[1].fixed_ip_v4
+      # recuperes les informations de la BDD
       mdpdb = ovh_cloud_project_database_user.db_eductive02.password
       domaindb = ovh_cloud_project_database.db_eductive02.endpoints[0].domain
       portdb = ovh_cloud_project_database.db_eductive02.endpoints[0].port
